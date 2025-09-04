@@ -9,7 +9,6 @@
   image-rendering: pixelated;
 }
 
-/* ===== General ===== */
 /* ===== Homepage Gradient Background ===== */
 body.homepage {
   background: linear-gradient(135deg, #7e30e1, #b983ff);
@@ -19,13 +18,14 @@ body.homepage {
   justify-content: center;
 }
 
+/* ===== Game Page Background ===== */
 body {
-  background: url('Images/backgrass.png') no-repeat center center fixed;
+  background: url('images/backgrass.png') no-repeat center center fixed; /* 👈 fixed case */
   background-size: cover;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  cursor: url('images/bird-cursor.png'), auto;
+  cursor: url('images/bird-cursor.png'), auto; /* 👈 fixed case */
 }
 
 /* ===== Car Game Area ===== */
@@ -57,10 +57,10 @@ body {
   background-size: cover;
 }
 .car {
-  background-image: url(Images/car.jpg);
+  background-image: url(images/car.jpg); /* 👈 fixed case */
 }
 .other {
-  background-image: url(Images/car4.jpg);
+  background-image: url(images/car4.jpg); /* 👈 fixed case */
 }
 
 /* ===== Score ===== */
@@ -103,7 +103,7 @@ body {
   transform: translate(-50%, -50%) scale(1.05);
 }
 
-/* ===== Buttons (Wallet, Start, etc) ===== */
+/* ===== Buttons ===== */
 button, #loginBtn, #logoutBtn, .start-btn {
   font-family: 'Press Start 2P', monospace;
   font-size: 12px;
