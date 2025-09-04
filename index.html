@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Car Racing Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
 <body class="homepage">
   <div class="home-container">
     <!-- START button -->
@@ -25,7 +33,16 @@
     <span class="pixel-text">Developed by</span>
     <a href="https://x.com/0xqowiyy" target="_blank" class="pixel-text link-text"> Crack</a>
   </footer>
+
+  <script>
+    // Simple START button toggle
+    document.getElementById("startBtn").addEventListener("click", () => {
+      document.getElementById("mainMenu").style.display = "flex";
+      document.getElementById("startBtn").style.display = "none";
+    });
+  </script>
 </body>
+</html>
 
   <!-- Firebase + MetaMask logic -->
   <script type="module">
