@@ -1,135 +1,151 @@
-const score=document.querySelector('.Score');
-const startscreen=document.querySelector('.StartScreen');
-const gamearea=document.querySelector('.GameArea');
-let player={ speed:5,score:0};
-let highest=0;
-startscreen.addEventListener('click',start);
+// ====== PAYMENT & PLAYS CHECK ======
+let paid = localStorage.getItem("race_paid");
+let plays = parseInt(localStorage.getItem("race_plays") || "0");
 
-let keys={ArrowUp: false, ArrowDown: false, ArrowRight: false, ArrowLeft: false};
-
-document.addEventListener('keydown',keyDown);
-document.addEventListener('keyup',keyUp);
-function keyDown(ev){
-    ev.preventDefault();
-    keys[ev.key]=true;
-
+// Check if payment made & plays available
+if (!paid || plays <= 0) {
+  alert("❌ You must pay 0.5 MON to play (2 plays per payment).");
+  window.location.href = "index.html";
 }
-function keyUp(ev){
-    ev.preventDefault();
-    keys[ev.key]=false;
-    
+
+// ====== GAME VARIABLES ======
+const score = document.querySelector('.Score');
+const startscreen = document.querySelector('.StartScreen');
+const gamearea = document.querySelector('.GameArea');
+let player = { speed: 5, score: 0 };
+let highest = 0;
+
+let keys = { ArrowUp: false, ArrowDown: false, ArrowRight: false, ArrowLeft: false };
+
+startscreen.addEventListener('click', start);
+document.addEventListener('keydown', keyDown);
+document.addEventListener('keyup', keyUp);
+
+function keyDown(ev) {
+  ev.preventDefault();
+  keys[ev.key] = true;
 }
-function isCollide(a,b){
-    aRect=a.getBoundingClientRect();
-    bRect=b.getBoundingClientRect();
-
-    return !((aRect.bottom<bRect.top)||(aRect.top>bRect.bottom)||(aRect.right<bRect.left)||(aRect.left>bRect.right));
+function keyUp(ev) {
+  ev.preventDefault();
+  keys[ev.key] = false;
 }
-function moveLines(){
-    let lines=document.querySelectorAll('.lines');
-    lines.forEach(function(item){
-        if(item.y>=700){
-            item.y-=750;
-        }
-        item.y+=player.speed;
-        item.style.top=item.y+'px';
 
-    })
+function isCollide(a, b) {
+  aRect = a.getBoundingClientRect();
+  bRect = b.getBoundingClientRect();
+  return !((aRect.bottom < bRect.top) || (aRect.top > bRect.bottom) || (aRect.right < bRect.left) || (aRect.left > bRect.right));
 }
-function endGame(){
-    player.start=false;
-    startscreen.classList.remove('hide');
-}
-function moveCar(car){
-    let other=document.querySelectorAll('.other');
-    other.forEach(function(item){
-        if(isCollide(car,item)){
-            console.log('HIT');
-            endGame();
-        }
-        if(item.y>=750){
-            item.y=-300;
-            item.style.left=Math.floor(Math.random()*350) + 'px';
-        }
-        item.y+=player.speed;
-        item.style.top=item.y+'px';
 
-    })
-}
-function gamePlay(){
-
-    let car=document.querySelector('.car');
-    let road=gamearea.getBoundingClientRect();
-
-    if(player.start){
-
-        moveLines();
-        moveCar(car);
-        if(keys.ArrowUp && player.y>(road.top+70)){
-            player.y-=player.speed;
-        }
-        if(keys.ArrowDown && player.y<(road.bottom-70)){
-            player.y+=player.speed;
-        }
-        if(keys.ArrowLeft && player.x>0){
-            player.x-=player.speed;
-        }
-        if(keys.ArrowRight && player.x<(road.width-50)){
-            player.x+=player.speed;
-        }
-
-        car.style.top=player.y + 'px';
-        car.style.left=player.x + 'px';
-
-        window.requestAnimationFrame(gamePlay);
-        //console.log(player.score++);
-        player.score++;
-        if(player.score>=highest)
-        {
-            highest=player.score;
-        }
-        score.innerHTML="Your Score:"+ player.score+"<br><br>"+"Highest Score:"+highest;
-
-
+function moveLines() {
+  let lines = document.querySelectorAll('.lines');
+  lines.forEach(function (item) {
+    if (item.y >= 700) {
+      item.y -= 750;
     }
-    
+    item.y += player.speed;
+    item.style.top = item.y + 'px';
+  })
 }
-function Reset(){
-    highest=0;
-}
-function start(){
-    //gamearea.classList.remove('hide');
-    startscreen.classList.add('hide');
-    gamearea.innerHTML="";
 
-    player.start=true;
-    player.score=0;
+// ====== DEDUCT PLAY AFTER GAME ======
+function deductPlay() {
+  plays = Math.max(plays - 1, 0);
+  localStorage.setItem("race_plays", plays);
+  if (plays <= 0) {
+    localStorage.removeItem("race_paid");
+    alert("❌ No plays left. Please pay 0.5 MON to continue.");
+    window.location.href = "index.html";
+  }
+}
+
+function endGame() {
+  player.start = false;
+  startscreen.classList.remove('hide');
+  deductPlay(); // Deduct play each time game ends
+}
+
+function moveCar(car) {
+  let other = document.querySelectorAll('.other');
+  other.forEach(function (item) {
+    if (isCollide(car, item)) {
+      console.log('HIT');
+      endGame();
+    }
+    if (item.y >= 750) {
+      item.y = -300;
+      item.style.left = Math.floor(Math.random() * 350) + 'px';
+    }
+    item.y += player.speed;
+    item.style.top = item.y + 'px';
+  })
+}
+
+function gamePlay() {
+  let car = document.querySelector('.car');
+  let road = gamearea.getBoundingClientRect();
+
+  if (player.start) {
+    moveLines();
+    moveCar(car);
+
+    if (keys.ArrowUp && player.y > (road.top + 70)) { player.y -= player.speed; }
+    if (keys.ArrowDown && player.y < (road.bottom - 70)) { player.y += player.speed; }
+    if (keys.ArrowLeft && player.x > 0) { player.x -= player.speed; }
+    if (keys.ArrowRight && player.x < (road.width - 50)) { player.x += player.speed; }
+
+    car.style.top = player.y + 'px';
+    car.style.left = player.x + 'px';
+
     window.requestAnimationFrame(gamePlay);
 
-
-
-   for(x=0;x<5;x++){
-        let roadline=document.createElement('div');
-        roadline.setAttribute('class','lines');
-        roadline.y=(x*150);
-        roadline.style.top=roadline.y+'px';
-        gamearea.appendChild(roadline);
+    player.score++;
+    if (player.score >= highest) {
+      highest = player.score;
     }
-    
-    let car=document.createElement('div');
-    car.setAttribute('class','car');
-    gamearea.appendChild(car);
+    score.innerHTML = "Your Score: " + player.score + "<br><br>" + "Highest Score: " + highest;
+  }
+}
 
-    player.x=car.offsetLeft;
-    player.y=car.offsetTop;
+function Reset() {
+  highest = 0;
+}
 
+function start() {
+  // Prevent starting if no plays left
+  if (!localStorage.getItem("race_paid") || parseInt(localStorage.getItem("race_plays") || "0") <= 0) {
+    alert("❌ You must pay 0.5 MON to play!");
+    window.location.href = "index.html";
+    return;
+  }
 
-    for(x=0;x<3;x++){
-        let othercar=document.createElement('div');
-        othercar.setAttribute('class','other');
-        othercar.y=((x+1)*350)* -1;
-        othercar.style.top=othercar.y+'px';
-        othercar.style.left=Math.floor(Math.random()*350) + 'px';
-        gamearea.appendChild(othercar);
-    }
+  startscreen.classList.add('hide');
+  gamearea.innerHTML = "";
+
+  player.start = true;
+  player.score = 0;
+  window.requestAnimationFrame(gamePlay);
+
+  for (x = 0; x < 5; x++) {
+    let roadline = document.createElement('div');
+    roadline.setAttribute('class', 'lines');
+    roadline.y = (x * 150);
+    roadline.style.top = roadline.y + 'px';
+    gamearea.appendChild(roadline);
+  }
+
+  let car = document.createElement('div');
+  car.setAttribute('class', 'car');
+  gamearea.appendChild(car);
+
+  player.x = car.offsetLeft;
+  player.y = car.offsetTop;
+
+  for (x = 0; x < 3; x++) {
+    let othercar = document.createElement('div');
+    othercar.setAttribute('class', 'other');
+    othercar.y = ((x + 1) * 350) * -1;
+    othercar.style.top = othercar.y + 'px';
+    othercar.style.left = Math.floor(Math.random() * 350) + 'px';
+    gamearea.appendChild(othercar);
+  }
 }
