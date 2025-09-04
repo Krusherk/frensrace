@@ -34,18 +34,9 @@
     <a href="https://x.com/0xqowiyy" target="_blank" class="pixel-text link-text"> Crack</a>
   </footer>
 
-  <script>
-    // Simple START button toggle
-    document.getElementById("startBtn").addEventListener("click", () => {
-      document.getElementById("mainMenu").style.display = "flex";
-      document.getElementById("startBtn").style.display = "none";
-    });
-  </script>
-</body>
-</html>
-
   <!-- Firebase + MetaMask logic -->
   <script type="module">
+    import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.min.js";
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
@@ -74,7 +65,7 @@
 
     let provider = null, signer = null, currentWallet = null;
 
-    // 🎮 Contract (replace with your FrensRace contract address if different)
+    // 🎮 Contract
     const contractAddress = "0x22FD0Bf38b75D39F32A19D7891aF6a4f3d8f5A00";
     const abi = [
       { "inputs": [], "name": "payToPlay", "outputs": [], "stateMutability": "payable", "type": "function" },
@@ -151,13 +142,13 @@
       if (!signer) return alert("Connect wallet first.");
       try {
         const contract = new ethers.Contract(contractAddress, abi, signer);
-        const tx = await contract.payToPlay({ value: ethers.parseEther("0.5") }); // 👈 0.5 MON
+        const tx = await contract.payToPlay({ value: ethers.parseEther("0.5") });
         await tx.wait();
 
-        localStorage.setItem("race_plays", "2"); // 👈 2 races
+        localStorage.setItem("race_plays", "2");
         localStorage.setItem("race_paid", "true");
         alert("✅ Payment successful! You now have 2 races.");
-        window.location.href = "game.html"; // 👈 go to race
+        window.location.href = "game.html";
       } catch (err) {
         alert("Payment failed. Try again.");
       }
@@ -180,9 +171,9 @@
       }
     })();
 
+    // START button toggle
     const startBtn = document.getElementById("startBtn");
     const mainMenu = document.getElementById("mainMenu");
-
     startBtn.addEventListener("click", () => {
       startBtn.style.display = "none";
       mainMenu.style.display = "block";
