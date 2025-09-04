@@ -154,3 +154,42 @@ button:hover,
   text-align: center;
   margin: 0 0 5px;
 }
+
+/* Center everything inside home-container */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 40px); /* leave space for footer */
+  text-align: center;
+  gap: 15px;
+}
+
+/* Style for menu buttons */
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+/* Footer always stays at bottom */
+footer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: white;
+}
+
+.link-text {
+  color: #FFD700;
+  text-decoration: none;
+}
+
+.link-text:hover {
+  text-decoration: underline;
+}
