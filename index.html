@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frens Race - Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background-image: url('images/racing-bg.png'); /* 🚗 replace with your racing bg */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: 'Press Start 2P', cursive;
+      color: white;
+      text-align: center;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 22px;
+      text-shadow: 2px 2px black;
+    }
+    .home-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+    .start-btn, #loginBtn, #logoutBtn, #submitDiscordBtn {
+      padding: 10px 20px;
+      font-size: 14px;
+      border: 2px solid white;
+      background: black;
+      color: white;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .start-btn:disabled, #submitDiscordBtn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #222;
+    }
+    #walletAddress {
+      font-size: 10px;
+      margin-top: 6px;
+      color: #ccc;
+      word-break: break-all;
+    }
+    .discord-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .discord-row input {
+      padding: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      border-radius: 6px;
+      border: 2px solid #e0e0e0;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      width: 220px;
+    }
+    footer {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-family: sans-serif;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="home-container">
+    <!-- START button -->
+    <button id="startBtn" disabled class="start-btn">START</button>
+
+    <!-- Hidden main menu -->
+    <div id="mainMenu" style="display:none;">
+      <button id="loginBtn">Login with MetaMask</button>
+      <button id="logoutBtn" style="display:none;">Logout</button>
+      <div id="walletAddress"></div>
+
+      <div class="discord-row" id="discordRow" style="display:none;">
+        <input id="discordInput" placeholder="Discord#1234" />
+        <button id="submitDiscordBtn">Save Discord</button>
+      </div>
+
+      <button class="start-btn" id="payToPlayBtn" disabled>
+        Pay 0.5 MON to Get 2 Plays
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="pixel-text">Developed by</span>
+    <a href="https://x.com/0xqowiyy" target="_blank" class="pixel-text link-text"> Crack</a>
+  </footer>
+
+  <!-- Firebase + MetaMask logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // ---------- FIREBASE CONFIG ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyBJC8jBpf4RJcrjAhgYumUmYzlOxma-ojk",
+      authDomain: "flappydak.firebaseapp.com",
+      databaseURL: "https://flappydak-default-rtdb.firebaseio.com",
+      projectId: "flappydak",
+      storageBucket: "flappydak.firebasestorage.app",
+      messagingSenderId: "189314171470",
+      appId: "1:189314171470:web:4c3a9068fdb909b147791f",
+      measurementId: "G-R0LF3F59W9"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // ---------- DOM ----------
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const walletAddressDisplay = document.getElementById("walletAddress");
+    const payBtn = document.getElementById("payToPlayBtn");
+    const discordRow = document.getElementById("discordRow");
+    const discordInput = document.getElementById("discordInput");
+    const submitDiscordBtn = document.getElementById("submitDiscordBtn");
+    const startBtn = document.getElementById("startBtn");
+    const mainMenu = document.getElementById("mainMenu");
+
+    // ---------- ETHEREUM ----------
+    let provider, signer, currentWallet;
+    const contractAddress = "0x22FD0Bf38b75D39F32A19D7891aF6a4f3d8f5A00"; // ✅ FrensRace
+    const abi = [
+      { "inputs": [], "name": "payToPlay", "outputs": [], "stateMutability": "payable", "type": "function" },
+      { "inputs": [], "name": "usePlay", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+      { "inputs": [{ "internalType": "address", "name": "player", "type": "address" }], "name": "getPlays", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
+    ];
+
+    // Firebase helpers
+    async function getDiscordForWallet(wallet) {
+      if (!wallet) return null;
+      try {
+        const snap = await get(ref(db, `discordUsernames/${wallet}`));
+        return snap.exists() ? snap.val().username : null;
+      } catch { return null; }
+    }
+    async function saveDiscordForWallet(wallet, username) {
+      if (!wallet || !username) return false;
+      try {
+        await set(ref(db, `discordUsernames/${wallet}`), { username, timestamp: Date.now() });
+        return true;
+      } catch { return false; }
+    }
+
+    // Update UI when wallet connects
+    async function onWalletConnected(addr) {
+      currentWallet = addr;
+      walletAddressDisplay.innerText = `Connected: ${addr}`;
+      loginBtn.style.display = "none";
+      logoutBtn.style.display = "inline-block";
+      payBtn.disabled = false;
+      discordRow.style.display = "flex";
+
+      const existing = await getDiscordForWallet(addr);
+      if (existing) {
+        discordInput.value = existing;
+        discordInput.disabled = true;
+        submitDiscordBtn.disabled = true;
+      } else {
+        discordInput.disabled = false;
+        submitDiscordBtn.disabled = false;
+      }
+    }
+
+    // Connect wallet
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert("Please install MetaMask");
+        return;
+      }
+      provider = new ethers.BrowserProvider(window.ethereum);
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      signer = await provider.getSigner();
+      const wallet = accounts[0];
+      localStorage.setItem("race_wallet", wallet);
+      await onWalletConnected(wallet);
+    }
+
+    // Disconnect wallet
+    function disconnectWallet() {
+      localStorage.removeItem("race_wallet");
+      currentWallet = null;
+      signer = null;
+      provider = null;
+      walletAddressDisplay.innerText = "";
+      loginBtn.style.display = "inline-block";
+      logoutBtn.style.display = "none";
+      payBtn.disabled = true;
+      discordRow.style.display = "none";
+    }
+
+    // Save Discord
+    submitDiscordBtn.addEventListener("click", async () => {
+      const username = discordInput.value.trim();
+      if (!currentWallet) return alert("Connect wallet first.");
+      if (!username) return alert("Enter your Discord username.");
+      const saved = await saveDiscordForWallet(currentWallet, username);
+      if (saved) {
+        localStorage.setItem("race_discord", username);
+        alert("Discord username saved!");
+      } else {
+        alert("Error saving Discord.");
+      }
+    });
+
+    // Pay button
+    payBtn.addEventListener("click", async () => {
+      if (!signer) return alert("Connect wallet first.");
+      try {
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+        const tx = await contract.payToPlay({ value: ethers.parseEther("0.5") });
+        await tx.wait();
+        alert("✅ Payment successful! You now have 2 plays.");
+        window.location.href = "game.html";
+      } catch (err) {
+        console.error("❌ Payment error:", err);
+        alert("Payment failed.");
+      }
+    });
+
+    // Login / logout
+    loginBtn.addEventListener("click", connectWallet);
+    logoutBtn.addEventListener("click", disconnectWallet);
+
+    // START button
+    startBtn.addEventListener("click", () => {
+      startBtn.style.display = "none";
+      mainMenu.style.display = "block";
+    });
+
+    // Restore session
+    (async function restoreFromStorage() {
+      const saved = localStorage.getItem("race_wallet");
+      if (saved && window.ethereum) {
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send("eth_accounts", []);
+        if (accounts && accounts.length && accounts[0].toLowerCase() === saved.toLowerCase()) {
+          signer = await provider.getSigner();
+          await onWalletConnected(saved);
+        } else {
+          localStorage.removeItem("race_wallet");
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
