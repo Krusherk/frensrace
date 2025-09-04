@@ -1,21 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Frens Race - Home</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
-</head>
-
 <body class="homepage">
   <div class="home-container">
     <!-- START button -->
     <button id="startBtn" class="start-btn">START</button>
 
     <!-- Menu (hidden until START clicked) -->
-    <div id="mainMenu" style="display:none;">
+    <div id="mainMenu" class="menu-container" style="display:none;">
       <button id="loginBtn">Login with MetaMask</button>
       <button id="logoutBtn" style="display:none;">Logout</button>
       <div id="walletAddress"></div>
@@ -26,7 +15,9 @@
       </div>
 
       <!-- 💸 Racing Payment -->
-      <button class="start-btn" id="payToPlayBtn" disabled>Pay 0.5 MON to Get 2 Races</button>
+      <button class="start-btn" id="payToPlayBtn" disabled>
+        Pay 0.5 MON to Get 2 Races
+      </button>
     </div>
   </div>
 
@@ -34,6 +25,7 @@
     <span class="pixel-text">Developed by</span>
     <a href="https://x.com/0xqowiyy" target="_blank" class="pixel-text link-text"> Crack</a>
   </footer>
+</body>
 
   <!-- Firebase + MetaMask logic -->
   <script type="module">
