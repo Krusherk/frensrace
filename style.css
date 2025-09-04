@@ -18,14 +18,14 @@ body.homepage {
   justify-content: center;
 }
 
-/* ===== Game Page Background ===== */
-body {
-  background: url('images/backgrass.png') no-repeat center center fixed; /* 👈 fixed case */
+/* ===== Game Background ===== */
+body.gamepage {
+  background: url('Images/backgrass.png') no-repeat center center fixed;
   background-size: cover;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  cursor: url('images/bird-cursor.png'), auto; /* 👈 fixed case */
+  cursor: url('images/bird-cursor.png'), auto;
 }
 
 /* ===== Car Game Area ===== */
@@ -49,18 +49,21 @@ body {
 }
 
 /* ===== Player & Other Cars ===== */
-.car, .other {
+.car,
+.other {
   width: 50px;
   height: 70px;
   position: absolute;
   bottom: 120px;
   background-size: cover;
 }
+
 .car {
-  background-image: url(images/car.jpg); /* 👈 fixed case */
+  background-image: url(Images/car.jpg);
 }
+
 .other {
-  background-image: url(images/car4.jpg); /* 👈 fixed case */
+  background-image: url(Images/car4.jpg);
 }
 
 /* ===== Score ===== */
@@ -73,7 +76,7 @@ body {
   font-size: 22px;
   font-weight: bold;
   padding: 10px 20px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   color: #FFD700;
   border: 2px solid #FFD700;
   border-radius: 6px;
@@ -96,15 +99,19 @@ body {
   border-radius: 15px;
   cursor: pointer;
   z-index: 2000;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
 }
+
 .StartScreen:hover {
   transform: translate(-50%, -50%) scale(1.05);
 }
 
-/* ===== Buttons ===== */
-button, #loginBtn, #logoutBtn, .start-btn {
+/* ===== Buttons (Wallet, Start, etc) ===== */
+button,
+#loginBtn,
+#logoutBtn,
+.start-btn {
   font-family: 'Press Start 2P', monospace;
   font-size: 12px;
   padding: 12px 24px;
@@ -116,7 +123,11 @@ button, #loginBtn, #logoutBtn, .start-btn {
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(126, 48, 225, 0.4);
 }
-button:hover, #loginBtn:hover, #logoutBtn:hover, .start-btn:hover {
+
+button:hover,
+#loginBtn:hover,
+#logoutBtn:hover,
+.start-btn:hover {
   background: linear-gradient(135deg, #9a42f3, #d1a3ff);
   transform: scale(1.05);
 }
@@ -137,6 +148,7 @@ button:hover, #loginBtn:hover, #logoutBtn:hover, .start-btn:hover {
   border-radius: 10px;
   z-index: 200;
 }
+
 .leaderboard h2 {
   font-size: 12px;
   text-align: center;
