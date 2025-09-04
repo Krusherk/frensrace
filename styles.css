@@ -10,6 +10,15 @@
 }
 
 /* ===== General ===== */
+/* ===== Homepage Gradient Background ===== */
+body.homepage {
+  background: linear-gradient(135deg, #7e30e1, #b983ff);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 body {
   background: url('Images/backgrass.png') no-repeat center center fixed;
   background-size: cover;
