@@ -31,9 +31,14 @@ function keyUp(ev) {
 }
 
 function isCollide(a, b) {
-  aRect = a.getBoundingClientRect();
-  bRect = b.getBoundingClientRect();
-  return !((aRect.bottom < bRect.top) || (aRect.top > bRect.bottom) || (aRect.right < bRect.left) || (aRect.left > bRect.right));
+  let aRect = a.getBoundingClientRect();
+  let bRect = b.getBoundingClientRect();
+  return !(
+    (aRect.bottom < bRect.top) ||
+    (aRect.top > bRect.bottom) ||
+    (aRect.right < bRect.left) ||
+    (aRect.left > bRect.right)
+  );
 }
 
 function moveLines() {
@@ -44,7 +49,7 @@ function moveLines() {
     }
     item.y += player.speed;
     item.style.top = item.y + 'px';
-  })
+  });
 }
 
 // ====== DEDUCT PLAY AFTER GAME ======
@@ -77,7 +82,7 @@ function moveCar(car) {
     }
     item.y += player.speed;
     item.style.top = item.y + 'px';
-  })
+  });
 }
 
 function gamePlay() {
@@ -112,7 +117,8 @@ function Reset() {
 
 function start() {
   // Prevent starting if no plays left
-  if (!localStorage.getItem("race_paid") || parseInt(localStorage.getItem("race_plays") || "0") <= 0) {
+  let startPlays = parseInt(localStorage.getItem("race_plays") || "0");
+  if (!localStorage.getItem("race_paid") || startPlays <= 0) {
     alert("❌ You must pay 0.5 MON to play!");
     window.location.href = "index.html";
     return;
@@ -125,7 +131,7 @@ function start() {
   player.score = 0;
   window.requestAnimationFrame(gamePlay);
 
-  for (x = 0; x < 5; x++) {
+  for (let x = 0; x < 5; x++) {
     let roadline = document.createElement('div');
     roadline.setAttribute('class', 'lines');
     roadline.y = (x * 150);
@@ -140,7 +146,7 @@ function start() {
   player.x = car.offsetLeft;
   player.y = car.offsetTop;
 
-  for (x = 0; x < 3; x++) {
+  for (let x = 0; x < 3; x++) {
     let othercar = document.createElement('div');
     othercar.setAttribute('class', 'other');
     othercar.y = ((x + 1) * 350) * -1;
